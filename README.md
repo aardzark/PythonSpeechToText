@@ -1,4 +1,5 @@
 # Python Speech To Text
+![Tabulated Speech To Text](./Images/Tabulated_STT.png)
 Speech to text solutions using pre-trained English, Ukrainian, and Russian language models.
 
 ## Neural Network Models
