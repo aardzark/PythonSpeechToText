@@ -5,9 +5,8 @@ Speech to text solutions using pre-trained English, Ukrainian, and Russian langu
 * OpenAI provides accurate translations with many features.
   * Free offline solution
 ## Neural Network Models
-## Various
-* [OpenAI Whisper](https://openai.com/blog/whisper/)
+## [Multilingual](./Neural%20Network%20Models/README.md#Multilingual)
+* [OpenAI's Whisper](https://openai.com/blog/whisper/)
 ## [Ukrainian](./Neural%20Network%20Models/README.md#Ukrainian)
 ### robinhad/voice-recognition-ua
 * [Mozilla DeepSpeech](https://openai.com/blog/whisper/)
-* OpenAI
