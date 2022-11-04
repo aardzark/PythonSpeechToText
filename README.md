@@ -1,5 +1,5 @@
 # Python Speech To Text
-Speech to text solutions using pre-trained English, Ukrainian, and Russian language models.
+Speech to text solutions using pre-trained language models.
 
 ![tabuleted results](./Images/tabulated_results.png)
 * OpenAI provides accurate translations with many features.
