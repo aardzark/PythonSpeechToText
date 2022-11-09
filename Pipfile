@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 deepspeech = "*"
 tabulate = "*"
+googletrans = "3.1.0a0"
 
 [dev-packages]
 
