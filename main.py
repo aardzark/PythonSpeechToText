@@ -85,14 +85,9 @@ def configure_openai_model(model_type: str):
 
 
 class Model:
-    model_engine: str = None
-    pretrained_model_location: str = None
-    scorer_location: str = None
-    config: dict = None
-
-    def __init__(self, model_type: str, config: dict, pretrained_model_location: str = None,
+    def __init__(self, model_engine: str, config: dict, pretrained_model_location: str = None,
                  scorer_location: str = None):
-        self.model_engine = model_type
+        self.model_engine = model_engine
         self.config = config
         self.pretrained_model_location = pretrained_model_location
         self.scorer_location = scorer_location
@@ -146,19 +141,19 @@ def get_file_locations(directory: str):
 def main(configs: [dict], headers: [dict]):
     DEEPSPEECH_MODEL: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/uk.pbmm"
     DEEPSPEECH_SCORER: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/kenlm.scorer"
-    CONFIGS: [] = []
-    CONFIGS.append({"engine": "DeepSpeech",
+    CONFIGS: [] = [{"engine": "DeepSpeech",
                     "beam_width": "100",
                     "lm_alpha": "0.7200873732640549",
-                    "lm_beta": "1.3010463457623596"})
-    CONFIGS.append({"engine": "OpenAI",
-                    "quality": "base"})
+                    "lm_beta": "1.3010463457623596"}, {"engine": "OpenAI",
+                                                       "quality": "medium"}]
     models: [] = None
     demo_files = get_file_locations("Audio/Demo")
     live_files = get_file_locations("Audio/Live")
     deepspeech_model = Model(CONFIGS[0].get("engine"), configs[0], DEEPSPEECH_MODEL, DEEPSPEECH_SCORER)
     openai_model = Model(CONFIGS[1].get("engine"), configs[1])
+    translator = Translator(service_urls=['translate.googleapis.com'])
 
+    logging.debug('RUNNING DEMO')
     for config in CONFIGS:
         if config.get("engine") == 'DeepSpeech':
             model = Model('DeepSpeech', config, DEEPSPEECH_MODEL, DEEPSPEECH_SCORER)
@@ -169,16 +164,18 @@ def main(configs: [dict], headers: [dict]):
         if config.get("engine") == 'OpenAI':
             model = Model('OpenAI', config)
             pretrained_model = retrieve_pretrained_model(model)
+            config['model'] = 'Whisper'
+
             for non_cvt_file in demo_files:
                 file = File(non_cvt_file)
-                transcribe_batch(pretrained_model, file)
+                transcribed_text = transcribe_batch(pretrained_model, file)
+                translated_text = translator.translate(transcribed_text, lang_tgt="en").text
 
-            #stt_model = STTModel(file, model, config.get('engine'), config.get('model'), file.name,
-                                 #config.get('name'),
-                                 #'', transcribe_batch(pretrained_model, file))
-            #print(tabulate([stt_model.tabular_data],
-                           #headers=['Engine', 'Model', 'File', 'Language', 'Actual Speech-to-Text',
-                                    #'Expected Speech-to-Text'], tablefmt="fancy_grid"))
+                stt_model = STTModel(file, model, config.get('engine'), config.get('model'), file.name,
+                                     translated_text, transcribed_text, EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE)
+                print(tabulate([stt_model.tabular_data],
+                               headers=['Engine', 'Model', 'File', 'Translated Speech', 'Original Speech',
+                                        'Expected Speech-to-Text'], tablefmt="fancy_grid"))
 
     # models: [] = [Model('DeepSpeech', DEEPSPEECH_MODEL, DEEPSPEECH_SCORER), Model('OpenAI')]
 
