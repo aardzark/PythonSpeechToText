@@ -1,4 +1,6 @@
 # Python Speech To Text
+* **STATUS:** *Completed and refactoring to OOP model for CaptionBot to follow and correcting misuse of the Python language, e.g. syntax and language features*
+
 The scripts in this repository demonstrate modern offline speech to text capabilities using pre-trained language models.
 * OpenAI provides accurate translations and additional features.
   * It is offline and free to use.
