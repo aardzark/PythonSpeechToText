@@ -2,6 +2,7 @@
 The scripts in this repository demonstrate modern offline speech to text capabilities using pre-trained language models.
 * OpenAI provides accurate translations and additional features.
   * It is offline and free to use.
+* [googletrans](https://pypi.org/project/googletrans/) is a python library which implements the Google Translate API
 
 ## Demo Results
 
