@@ -10,19 +10,6 @@ import whisper
 from googletrans import Translator
 import os
 
-# robinhad/voice-recognition-ua
-# pretrained language model
-UKRAINIAN_MODEL_ROBINHAD: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/uk.pbmm"
-# external language model that assists with transcription
-UKRAINIAN_SCORER_ROBINHAD: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/kenlm.scorer"
-
-# github.com/egorsmkv/speech-recognition-uk/tree/master/tts-demos
-UKRAINIAN_AUDIO_SAMPLE_NEON: str = "Audio Demo/audio_submission_ylqyya.mp3.wav"
-UKRAINIAN_AUDIO_SAMPLE_SILERO: str = "Audio Demo/tts-demos_silero_tts.wav"
-EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE: str = """Кам'янець-Подільський - місто в Хмельницькій області України, центр Кам'янець-Подільської
-міської об'єднаної територіальної громади і Кам'янець-Подільського району."""
-
-
 class File:
     rate: int = None
     frames: int = None
@@ -138,9 +125,17 @@ def get_file_locations(directory: str):
     return file_paths
 
 
-def main(configs: [dict], headers: [dict]):
+def main():
+    # github.com/robinhad/voice-recognition-ua: pretrained language model
     DEEPSPEECH_MODEL: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/uk.pbmm"
+    # github.com/robinhad/voice-recognition-ua: pretrained scorer
     DEEPSPEECH_SCORER: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/kenlm.scorer"
+    # github.com/egorsmkv/speech-recognition-uk/tree/master/tts-demos: text-to-speech generated audio
+    UKRAINIAN_AUDIO_SAMPLE_NEON: str = "Audio Demo/audio_submission_ylqyya.mp3.wav"
+    UKRAINIAN_AUDIO_SAMPLE_SILERO: str = "Audio Demo/tts-demos_silero_tts.wav"
+    EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE: str = """Кам'янець-Подільський - місто в Хмельницькій області України, центр Кам'янець-Подільської
+    міської об'єднаної територіальної громади і Кам'янець-Подільського району."""
+
     CONFIGS: [] = [{"engine": "DeepSpeech",
                     "beam_width": "100",
                     "lm_alpha": "0.7200873732640549",
@@ -149,8 +144,8 @@ def main(configs: [dict], headers: [dict]):
     models: [] = None
     demo_files = get_file_locations("Audio/Demo")
     live_files = get_file_locations("Audio/Live")
-    deepspeech_model = Model(CONFIGS[0].get("engine"), configs[0], DEEPSPEECH_MODEL, DEEPSPEECH_SCORER)
-    openai_model = Model(CONFIGS[1].get("engine"), configs[1])
+    # deepspeech_model = Model(CONFIGS[0].get("engine"), configs[0], DEEPSPEECH_MODEL, DEEPSPEECH_SCORER)
+    # openai_model = Model(CONFIGS[1].get("engine"), configs[1])
     translator = Translator(service_urls=['translate.googleapis.com'])
 
     logging.debug('RUNNING DEMO')
@@ -211,29 +206,4 @@ def main(configs: [dict], headers: [dict]):
 
 
 if __name__ == '__main__':
-    stt_configs: [dict] = []
-    voice_recognition_ua_v_0_04_config = {
-        "beam_width": "100",
-        "lm_alpha": "0.7200873732640549",
-        "lm_beta": "1.3010463457623596"
-    }
-    voice_recognition_openai_config = {
-        "detect_language": "false"
-    }
-    stt_headers: [dict] = []
-    voice_recognition_ua_v_0_04_headers = {
-        'Engine': "DeepSpeech",
-        'Model': 'robinhad v0.4',
-        'Language': 'Ukrainian',
-    }
-    voice_recognition_openai_headers = {
-        'Engine': "OpenAI",
-        'Model': 'medium',
-        'Language': 'Various',
-    }
-    stt_configs.append(voice_recognition_ua_v_0_04_config)
-    stt_configs.append(voice_recognition_openai_config)
-    stt_headers.append(voice_recognition_ua_v_0_04_headers)
-    stt_headers.append(voice_recognition_openai_headers)
-
-    exit(main(stt_configs, stt_headers))
+    exit(main())
