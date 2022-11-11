@@ -10,11 +10,8 @@ import whisper
 from googletrans import Translator
 import os
 
+
 class File:
-    rate: int = None
-    frames: int = None
-    buffer: bytes = None
-    name: str = None
 
     def __init__(self, file_location: str):
         with wave.open(file_location, 'rb') as wave_read:
@@ -29,16 +26,6 @@ class File:
 
 
 class STTModel:
-    file: File = None
-    model = None
-    engine: str = None
-    model_name: str = None
-    file_name: str = None
-    language: str = None
-    actual_stt: str = None
-    expected_stt: str = None
-    tabular_data: [str] = None
-
     def __init__(self, file: File, model, engine: str, model_name: str, file_name: str, language: str,
                  actual_stt: str, expected_stt: str):
         self.file = file
@@ -60,7 +47,7 @@ def configure_deepspeech_model(model_path: str, config: dict):
     lm_beta = float(config.get("lm_beta"))
 
     deepspeech_model = Model(model_path)
-    deepspeech_model.enableExternalScorer(UKRAINIAN_SCORER_ROBINHAD)
+    # deepspeech_model.enableExternalScorer(UKRAINIAN_SCORER_ROBINHAD)
     deepspeech_model.setScorerAlphaBeta(lm_alpha, lm_beta)
     deepspeech_model.setBeamWidth(beam_width)
     return deepspeech_model
@@ -133,7 +120,7 @@ def main():
     # github.com/egorsmkv/speech-recognition-uk/tree/master/tts-demos: text-to-speech generated audio
     UKRAINIAN_AUDIO_SAMPLE_NEON: str = "Audio Demo/audio_submission_ylqyya.mp3.wav"
     UKRAINIAN_AUDIO_SAMPLE_SILERO: str = "Audio Demo/tts-demos_silero_tts.wav"
-    EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE: str = """Кам'янець-Подільський - місто в Хмельницькій області України, центр Кам'янець-Подільської
+    EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE: str = """Кам'янець-Подільський - місто в Хмельницькій області України, цeентр Кам'янець-Подільської
     міської об'єднаної територіальної громади і Кам'янець-Подільського району."""
 
     CONFIGS: [] = [{"engine": "DeepSpeech",
