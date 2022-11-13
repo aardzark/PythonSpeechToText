@@ -1,6 +1,6 @@
 import logging
 import sys
-
+from configparser import ConfigParser
 import deepspeech
 from deepspeech import Model
 from tabulate import tabulate
@@ -10,9 +10,11 @@ import whisper
 from googletrans import Translator
 import os
 
-
+configs = ConfigParser()
+configs.read("config.ini")
+DEMO_EXPECTED_RESULT = """Кам'янець-Подільський - місто в Хмельницькій області України, цeентр 
+Кам'янець-Подільської міської об'єднаної територіальної громади і Кам'янець-Подільського району."""
 class File:
-
     def __init__(self, file_location: str):
         with wave.open(file_location, 'rb') as wave_read:
             self.rate = wave_read.getframerate()
@@ -114,20 +116,20 @@ def get_file_locations(directory: str):
 
 def main():
     # github.com/robinhad/voice-recognition-ua: pretrained language model
-    DEEPSPEECH_MODEL: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/uk.pbmm"
+    # DEEPSPEECH_MODEL: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/uk.pbmm"
     # github.com/robinhad/voice-recognition-ua: pretrained scorer
-    DEEPSPEECH_SCORER: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/kenlm.scorer"
+    # DEEPSPEECH_SCORER: str = "Neural Network Models/Ukrainian/DeepSpeech/robinhad_voice-recognition-ua-v-0-04/kenlm.scorer"
     # github.com/egorsmkv/speech-recognition-uk/tree/master/tts-demos: text-to-speech generated audio
-    UKRAINIAN_AUDIO_SAMPLE_NEON: str = "Audio Demo/audio_submission_ylqyya.mp3.wav"
-    UKRAINIAN_AUDIO_SAMPLE_SILERO: str = "Audio Demo/tts-demos_silero_tts.wav"
-    EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE: str = """Кам'янець-Подільський - місто в Хмельницькій області України, цeентр Кам'янець-Подільської
-    міської об'єднаної територіальної громади і Кам'янець-Подільського району."""
+    UKRAINIAN_AUDIO_SAMPLE_NEON: str = "Audio/Demo/tts-demos_neon_tts.wav"
+    UKRAINIAN_AUDIO_SAMPLE_SILERO: str = "Audio/Demo/tts-demos_silero_tts.wav"
+    # EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE: str = """Кам'янець-Подільський - місто в Хмельницькій області України, цeентр Кам'янець-Подільської
+    # міської об'єднаної територіальної громади і Кам'янець-Подільського району."""
 
-    CONFIGS: [] = [{"engine": "DeepSpeech",
-                    "beam_width": "100",
-                    "lm_alpha": "0.7200873732640549",
-                    "lm_beta": "1.3010463457623596"}, {"engine": "OpenAI",
-                                                       "quality": "medium"}]
+    # CONFIGS: [] = [{"engine": "DeepSpeech",
+                    # "beam_width": "100",
+                    # "lm_alpha": "0.7200873732640549",
+                    # "lm_beta": "1.3010463457623596"}, {"engine": "OpenAI",
+                                                       # "quality": "medium"}]
     models: [] = None
     demo_files = get_file_locations("Audio/Demo")
     live_files = get_file_locations("Audio/Live")
@@ -136,28 +138,34 @@ def main():
     translator = Translator(service_urls=['translate.googleapis.com'])
 
     logging.debug('RUNNING DEMO')
-    for config in CONFIGS:
-        if config.get("engine") == 'DeepSpeech':
-            model = Model('DeepSpeech', config, DEEPSPEECH_MODEL, DEEPSPEECH_SCORER)
-            pretrained_model = retrieve_pretrained_model(model)
-            for non_cvt_file in demo_files:
-                file = File(non_cvt_file)
-                transcribe_batch(pretrained_model, file)
-        if config.get("engine") == 'OpenAI':
-            model = Model('OpenAI', config)
-            pretrained_model = retrieve_pretrained_model(model)
-            config['model'] = 'Whisper'
 
-            for non_cvt_file in demo_files:
-                file = File(non_cvt_file)
-                transcribed_text = transcribe_batch(pretrained_model, file)
-                translated_text = translator.translate(transcribed_text, lang_tgt="en").text
+    # This is not currently running -- refactoring logic to rely on the config file and object
+    for section in configs.sections():
+        if "ENGINE" in section:
+            for (key, val) in configs.items(section):
+                if key == "name":
+                    if val == "DeepSpeech":
+                        model = Model('DeepSpeech', config, DEEPSPEECH_MODEL, DEEPSPEECH_SCORER)
+                        pretrained_model = retrieve_pretrained_model(model)
+                        for non_cvt_file in demo_files:
+                            file = File(non_cvt_file)
+                            transcribe_batch(pretrained_model, file)
+                    if val == "OpenAI":
+                        model = Model('OpenAI', config)
+                        pretrained_model = retrieve_pretrained_model(model)
+                        config['model'] = 'Whisper'
 
-                stt_model = STTModel(file, model, config.get('engine'), config.get('model'), file.name,
-                                     translated_text, transcribed_text, EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE)
-                print(tabulate([stt_model.tabular_data],
-                               headers=['Engine', 'Model', 'File', 'Translated Speech', 'Original Speech',
-                                        'Expected Speech-to-Text'], tablefmt="fancy_grid"))
+                        for non_cvt_file in demo_files:
+                            file = File(non_cvt_file)
+                            transcribed_text = transcribe_batch(pretrained_model, file)
+                            translated_text = translator.translate(transcribed_text, lang_tgt="en").text
+
+                            stt_model = STTModel(file, model, config.get('engine'), config.get('model'), file.name,
+                                                 translated_text, transcribed_text,
+                                                 EXPECTED_OUTPUT_UKRAINIAN_AUDIO_SAMPLE)
+                            print(tabulate([stt_model.tabular_data],
+                                           headers=['Engine', 'Model', 'File', 'Translated Speech', 'Original Speech',
+                                                    'Expected Speech-to-Text'], tablefmt="fancy_grid"))
 
     # models: [] = [Model('DeepSpeech', DEEPSPEECH_MODEL, DEEPSPEECH_SCORER), Model('OpenAI')]
 
