@@ -1,5 +1,5 @@
 # Python Speech To Text
-* **STATUS:** *Completed and refactoring to OOP model for CaptionBot to follow and correcting misuse of the Python language, e.g. syntax and language features.*
+* **STATUS:** *Completed and refactoring to an OOP model and improving Python syntax/convention*
 
 The scripts in this repository demonstrate modern offline speech to text capabilities using pre-trained language models.
 * OpenAI provides accurate translations and additional features.
