@@ -1,5 +1,5 @@
 # Python Speech To Text
-* **STATUS:** *Completed and refactoring to an OOP model and improving Python syntax/convention*
+* **STATUS:** *Completed and refactoring to an OOP model and improving Python syntax and convention*
 
 The scripts in this repository demonstrate modern offline speech to text capabilities using pre-trained language models.
 * OpenAI provides accurate translations and additional features.
